@@ -1,7 +1,8 @@
 # Flappy Bird - Console Version in C++
 Open Source Project: https://github.com/BlackyDrum/flappy-bird.git
 
----![Screenshot 2025-04-16 115420](https://github.com/user-attachments/assets/3fab4764-56c9-4f5d-9d6a-4558ff62c69b)
+![Screenshot 2025-04-16 140200](https://github.com/user-attachments/assets/f5e808fd-b4a1-4955-a14b-9b1b8230c483)
+
 
 ![Screenshot 2025-04-16 140552](https://github.com/user-attachments/assets/f0850e3b-d68f-44da-b1c8-044ba6d8a05f)
 
