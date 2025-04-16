@@ -1,113 +1,202 @@
-# 🐤 Flappy Bird - Console Edition (Smooth Version)
+# Flappy Bird - Console Version in C++
+Open Source Project: https://github.com/BlackyDrum/flappy-bird.git
 
-A console-based Flappy Bird game developed in **C++** using **Windows API**. This version simulates real-time gameplay with smooth animations, custom rendering, and multiple difficulty levels.
+---![Screenshot 2025-04-16 115420](https://github.com/user-attachments/assets/3fab4764-56c9-4f5d-9d6a-4558ff62c69b)
 
-> Built for fun and practice, this game works entirely in the Windows console with no external libraries (except standard headers).
+![Screenshot 2025-04-16 140552](https://github.com/user-attachments/assets/f0850e3b-d68f-44da-b1c8-044ba6d8a05f)
+
+![Screenshot 2025-04-16 140605](https://github.com/user-attachments/assets/c15a35ae-b9df-4025-a24a-6ea72c97c1ae)
+
+
+
+ Overview
+
+This is a fully functional console-based Flappy Bird clone built in **C++** using **Windows API (Win32)**. The game runs entirely in the terminal, utilizing character-based graphics and `CHAR_INFO` buffers for rendering. It features:
+
+- Dynamic difficulty selection (Easy, Medium, Hard)
+- Colorful console-based graphics
+- Real-time input handling
+- Score tracking
+- Gravity, pipe generation, and collision mechanics
+- Smooth animations with minimal flicker
 
 ---
 
-## 📋 Features
+## 📽️ Game Preview
 
-- 🐦 Playable Flappy Bird game in console
-- 📈 Score tracking and increasing difficulty
-- 🎮 Real-time controls using `conio.h`
-- 🚀 Smooth rendering with `CHAR_INFO` buffer
-- 💡 Difficulty selection (Easy / Medium / Hard)
-- 🧱 Pipe collision detection
-- ⏸️ Pause / Resume functionality
-- ❌ Game over screen with replay/quit options
-
----
-
-## 🎮 Controls
-
-| Key          | Action                    |
-|--------------|---------------------------|
-| `Space` / `W`| Jump (Flap the bird)      |
-| `P`          | Pause the game            |
-| `R`          | Resume after pause        |
-| `Q`          | Quit the game             |
-| `1` `2` `3`  | Select difficulty level    |
 
 ---
 
 ## 🧠 How It Works
 
-### 🌀 Game Loop Flow
+### 1. **Console Rendering with `CHAR_INFO`**
+Instead of using graphics libraries, we simulate a screen using a 2D array of `CHAR_INFO`. The buffer is rendered using `WriteConsoleOutput`.
 
-1. **Start screen** → player selects difficulty
-2. **Setup** initializes variables and game state
-3. **Game loop** runs until `gameOver == true`:
-   - Clears buffer
-   - Draws bird, pipes, and borders
-   - Renders buffer to console
-   - Handles input
-   - Updates game logic (gravity, pipe movement, collision)
-4. **Game over screen** appears → press `R` to restart or `Q` to quit
+- `CHAR_INFO consoleBuffer[HEIGHT][WIDTH];`: a 2D grid to store characters and their colors.
+- `renderBuffer()`: sends this buffer to the console efficiently, enabling fast updates without flickering.
 
-### 🖼️ Rendering System
+### 2. **Game Loop**
+The game follows a loop structure:
+```cpp
+while (!gameOver) {
+    processInput();
+    updateGame();
+    clearBuffer();
+    drawGame();
+    renderBuffer();
+    Sleep(30);
+}
+This loop handles input, updates physics, renders frames, and manages frame timing.
 
-- A `CHAR_INFO` buffer acts as a 2D frame buffer
-- All characters (bird, pipes, borders) are drawn into the buffer
-- The buffer is written to console using `WriteConsoleOutput`
-- No flickering thanks to direct buffer rendering
+3. Input Handling
+Using _kbhit() and _getch() from <conio.h> for non-blocking input. Pressing:
 
----
+SPACE makes the bird "flap" upwards.
 
-## 🗂️ Data Structures Used
+ESC exits the game.
 
-| Data Structure           | Purpose                                              |
-|--------------------------|------------------------------------------------------|
-| `vector<int> pipeX`      | Stores x-position of each pipe                       |
-| `vector<int> pipeGapY`   | Stores vertical gap positions for each pipe          |
-| `enum Difficulty`        | Easy, Medium, Hard settings                          |
-| `CHAR_INFO[]`            | 1D buffer acting as screen for smooth rendering      |
-| `HANDLE`, `COORD`        | Windows API types for console control and cursor     |
+4. Game Physics
+Gravity pulls the bird down every few frames based on difficulty.
 
----
+Pipes move from right to left.
 
-## 🎯 Difficulty Levels
+Collision is detected against pipes and screen edges.
 
-| Level   | Speed | Gravity | Jump Force |
-|---------|-------|---------|-------------|
-| Easy    | 1     | 1       | -3          |
-| Medium  | 2     | 1       | -4          |
-| Hard    | 3     | 2       | -5          |
+5. Difficulty Mechanics
+Easy: Large gaps, slow pipe speed, slow gravity.
 
-- Speed controls how fast pipes move
-- Gravity determines how fast the bird falls
-- Jump Force determines how high the bird jumps
+Medium: Moderate settings.
 
----
+Hard: Small gaps, fast pipe movement, faster gravity.
 
-## ⚖️ Trade-offs & Design Choices
+6. Pipe Logic
+Pipes are stored as a vector of pairs:
 
-| Design Choice                                | Trade-off / Reason                                                                 |
-|---------------------------------------------|-------------------------------------------------------------------------------------|
-| Console-only rendering                       | No graphics library needed, but limits to ASCII visuals                            |
-| Direct buffer (`CHAR_INFO[]`) rendering      | Smooth gameplay, avoids `system("cls")` flickering                                 |
-| Hardcoded constants (screen size, pipe width)| Simplicity > configurability                                                       |
-| No object-oriented structure                 | Straightforward procedural code for readability                                    |
-| `conio.h` for input                          | Quick non-blocking key reads, but not portable beyond Windows                      |
+cpp
+Copy
+Edit
+std::vector<std::pair<int, int>> pipes;
+Where:
 
----
+first = X position of the pipe
 
-## 🧪 Example Screenshots (ASCII)
+second = Y center of the gap
 
----
+Pipes move left over time and get removed when off-screen.
 
-## 🔧 How to Compile & Run
+📦 Data Structures Used
 
-### ✅ Requirements
+Structure	Purpose
+vector<pair<int,int>>	Stores pipes with their position and gap center
+CHAR_INFO buffer[][]	Stores each character and its color on-screen
+int variables	For tracking bird position, score, difficulty, etc.
+⚙️ Technical Approach
+✅ Rendering
+Uses CHAR_INFO and WriteConsoleOutput() to simulate real-time graphics.
 
-- Windows OS
-- C++ compiler (MSVC / MinGW)
-- Console that supports `conio.h` and Windows API
+No third-party libraries required — runs in plain Windows terminal.
 
-### 🛠️ Compile
+✅ Input
+Real-time, non-blocking keystroke handling with <conio.h>.
 
-Using MinGW or similar:
+✅ Timing
+Uses Sleep(30) for frame pacing.
 
-```bash
-g++ -o FlappyBird flappybird.cpp
+Gravity, pipe spawning, and movement are based on frameCount % rate.
+
+✅ Trade-offs
+Pros:
+
+No need for graphics libraries.
+
+Cross-system within Windows.
+
+Clean, colored console rendering.
+
+Cons:
+
+Platform-dependent (<windows.h>, <conio.h>).
+
+Limited graphic fidelity due to ASCII constraints.
+🕹️ Controls
+
+Key	Action
+SPACE	Flap (bird jumps)
+ESC	Quit game
+1 2 3	Select difficulty
+🧪 Features & Gameplay
+Bird is always at X = 20 and moves vertically.
+
+Pipes have gaps, with difficulty scaling gap size.
+
+Collisions occur if bird hits pipe or screen bounds.
+
+The score increments when the bird successfully passes a pipe.
+
+Full game over and restart menu.
+
+Difficulty selection menu with color-coded options.
+
+🧩 File Structure
+less
+Copy
+Edit
+flappy-bird/
+├── main.cpp       // Complete game code
+├── README.md      // You are here!
+🖥️ Setup Instructions
+Requirements:
+Windows OS
+
+C++ Compiler (MSVC / g++)
+
+Terminal with ANSI color support
+
+To Compile (Windows):
+Using g++:
+
+bash
+Copy
+Edit
+g++ main.cpp -o flappy-bird
+Or use any IDE like Code::Blocks or Visual Studio.
+
+To Run:
+bash
+Copy
+Edit
+flappy-bird.exe
+📈 Difficulty Settings
+
+Difficulty	Gap Size	Pipe Speed	Gravity Rate	Pipe Spawn Rate
+Easy	12	Slow	Slow	Sparse (40 frames)
+Medium	10	Medium	Medium	Normal (30 frames)
+Hard	8	Fast	Fast	Dense (25 frames)
+🧠 Future Enhancements (Ideas)
+High score tracking
+
+Custom skins (ASCII options)
+
+Sound effects (Beep tones)
+
+Multi-bird or multiplayer support
+
+Enhanced animations (e.g., wings)
+
+💻 Developed With
+C++
+
+Windows Console API
+
+<windows.h>, <conio.h>, <vector>, <ctime>
+
+👨‍💻 Contributors
+Heet Malli
+
+Aum Vaghela
+
+Jainish Chaudhary
+
+Krish Paghdar
+
 
